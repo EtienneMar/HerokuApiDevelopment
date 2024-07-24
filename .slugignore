@@ -1,0 +1,8 @@
+.log
+/app/test
+/app/scripts
+/app/README.md
+/app/deadrequirement.txt
+/app/.gitignore
+/app/run.py
+/app
