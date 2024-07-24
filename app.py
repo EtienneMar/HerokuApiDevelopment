@@ -83,7 +83,8 @@ def predict():
             app.logger.error("SK_ID_CURR %s ne peut pas être converti en entier.", sk_id_curr)
             return jsonify({'error': f'SK_ID_CURR {sk_id_curr} ne peut pas être converti en entier.'}), 400
         
-        app.logger.info("Valeurs de df_prediction['SK_ID_CURR'] (premiers 10) : %s", df_prediction['SK_ID_CURR'].tolist()[:10])
+        app.logger.info("Noms des 10 premières colonnes : %s", df_prediction.columns.tolist()[:10])
+
         #logger.info(f"data_row is : {df_prediction['SK_ID_CURR'] == sk_id_curr}")
         
         try:
