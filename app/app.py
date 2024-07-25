@@ -38,17 +38,34 @@ except Exception as e:
 
 # Spécifier le chemin relatif du fichier de données prétraitées
 processed_data_path = os.path.join(current_dir, 'data', 'X_predictionV1.csv')
-# Charger les données prétraitées
+
+# Lire les données en morceaux et les stocker dans un dictionnaire
+chunk_size = 10000  # Définir la taille du morceau (par exemple, 10 000 lignes)
+df_chunks = pd.read_csv(processed_data_path, chunksize=chunk_size)
+data_dict = {}
+
 try:
-    df_prediction = pd.read_csv(processed_data_path)
+    for chunk in df_chunks:
+        for _, row in chunk.iterrows():
+            sk_id_curr = row['SK_ID_CURR']
+            data_dict[sk_id_curr] = chunk[chunk['SK_ID_CURR'] == sk_id_curr]
     logger.info("Données prétraitées chargées avec succès")
-    logger.info(f"Colonnes disponibles dans df_prediction : {df_prediction.columns.tolist()[:10]}")
 except FileNotFoundError:
     logger.error(f"Le fichier de données prétraitées à l'emplacement {processed_data_path} est introuvable.")
-    df_prediction = None
 except Exception as e:
     logger.error(f"Erreur lors du chargement des données prétraitées : {e}")
-    df_prediction = None
+    
+# Charger les données prétraitées
+#try:
+#    df_prediction = pd.read_csv(processed_data_path)
+#    logger.info("Données prétraitées chargées avec succès")
+#    logger.info(f"Colonnes disponibles dans df_prediction : {df_prediction.columns.tolist()[:10]}")
+#except FileNotFoundError:
+#    logger.error(f"Le fichier de données prétraitées à l'emplacement {processed_data_path} est introuvable.")
+#    df_prediction = None
+#except Exception as e:
+#    logger.error(f"Erreur lors du chargement des données prétraitées : {e}")
+#    df_prediction = None
 
 # Extraction des noms de colonnes utilisées pour l'entraînement
 try:
