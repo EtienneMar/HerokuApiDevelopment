@@ -43,7 +43,7 @@ chunks_list = []
 
 # Lire le fichier CSV en morceaux
 try:
-    for chunk in pd.read_csv(processed_data_path, chunksize=5000):  # Ajustez la taille du chunk selon vos besoins
+    for chunk in pd.read_csv(processed_data_path, chunksize=2000):  # Ajustez la taille du chunk selon vos besoins
         chunks_list.append(chunk)
     df_prediction = pd.concat(chunks_list, ignore_index=True)
     logger.info("Données prétraitées chargées avec succès")
@@ -142,6 +142,10 @@ def predict():
     except Exception as e:
         app.logger.error(f"Erreur lors de la gestion de la requête : {e}")
         return jsonify({'error': str(e)}), 400
+
+#def read_data_frame():
+
+#def 
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
