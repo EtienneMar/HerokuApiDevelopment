@@ -42,7 +42,7 @@ processed_data_path = os.path.join(current_dir, 'data', 'X_predictionV1.csv')
 try:
     df_prediction = pd.read_csv(processed_data_path)
     logger.info("Données prétraitées chargées avec succès")
-    logger.info(f"Colonnes disponibles dans df_prediction : {df_prediction.columns.tolist()}")
+    logger.info(f"Colonnes disponibles dans df_prediction : {df_prediction.columns.tolist()[:10]}")
 except FileNotFoundError:
     logger.error(f"Le fichier de données prétraitées à l'emplacement {processed_data_path} est introuvable.")
     df_prediction = None
