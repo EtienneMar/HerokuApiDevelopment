@@ -20,9 +20,11 @@ logging.basicConfig(level=logging.INFO,
 
 logger = logging.getLogger(__name__)
 
+    
 # Obtenir le chemin absolu du répertoire courant
 current_dir = os.path.dirname(os.path.abspath(__file__))
-
+# Spécifier le chemin relatif du fichier de données prétraitées
+processed_data_path = os.path.join(current_dir, 'data', 'X_predictionV1.csv')
 # Spécifier le chemin relatif du fichier modèle
 model_path = os.path.join(current_dir, 'model', 'xgboost_model.pkl')
 # Charger le modèle
@@ -36,24 +38,6 @@ except Exception as e:
     logger.error(f"Erreur lors du chargement du modèle : {e}")
     model = None
 
-# Spécifier le chemin relatif du fichier de données prétraitées
-processed_data_path = os.path.join(current_dir, 'data', 'X_predictionV1.csv')
-# Charger les données prétraitées
-chunks_list = []
-
-# Lire le fichier CSV en morceaux
-try:
-    for chunk in pd.read_csv(processed_data_path, chunksize=2000):  # Ajustez la taille du chunk selon vos besoins
-        chunks_list.append(chunk)
-    df_prediction = pd.concat(chunks_list, ignore_index=True)
-    logger.info("Données prétraitées chargées avec succès")
-    logger.info(f"Colonnes disponibles dans df_prediction : {df_prediction.columns.tolist()[:10]}")
-except FileNotFoundError:
-    logger.error(f"Le fichier de données prétraitées à l'emplacement {processed_data_path} est introuvable.")
-    df_prediction = None
-except Exception as e:
-    logger.error(f"Erreur lors du chargement des données prétraitées : {e}")
-    df_prediction = None
 # Extraction des noms de colonnes utilisées pour l'entraînement
 try:
     if model:
@@ -86,25 +70,16 @@ def predict():
         except ValueError:
             app.logger.error("SK_ID_CURR %s ne peut pas être converti en entier.", sk_id_curr)
             return jsonify({'error': f'SK_ID_CURR {sk_id_curr} ne peut pas être converti en entier.'}), 400
-        
-        app.logger.info("Noms des 10 premières colonnes : %s", df_prediction.columns.tolist()[:10])
 
-        #logger.info(f"data_row is : {df_prediction['SK_ID_CURR'] == sk_id_curr}")
-        
-        try:
-            # Récupérer les données correspondant à SK_ID_CURR depuis df_prediction
-            
-     
-            data_row = df_prediction[df_prediction['SK_ID_CURR'] == sk_id_curr]
+        # Lire le fichier CSV en morceaux et filtrer les données
+        data_found = False
+        for chunk in pd.read_csv(processed_data_path, chunksize=2000):
+            data_row = chunk[chunk['SK_ID_CURR'] == sk_id_curr]
+            if not data_row.empty:
+                data_found = True
+                break
 
-        except KeyError:
-            app.logger.error("SK_ID_CURR n'existe pas dans les colonnes de df_prediction")
-            return jsonify({'error'"SK_ID_CURR n'existe pas dans les colonnes de df_prediction"}), 400
-        except Exception as e:
-            app.logger.error("Erreur dans la récupération des données : %s", e)
-            return jsonify({'error': str(e)}), 400
-
-        if data_row.empty:
+        if not data_found:
             app.logger.warning("Aucune donnée trouvée pour SK_ID_CURR %s", sk_id_curr)
             return jsonify({'error': f'Aucune donnée trouvée pour SK_ID_CURR {sk_id_curr}.'}), 404
 
@@ -143,7 +118,7 @@ def predict():
         app.logger.error(f"Erreur lors de la gestion de la requête : {e}")
         return jsonify({'error': str(e)}), 400
 
-#def read_data_frame():
+
 
 #def 
 
