@@ -7,5 +7,5 @@ COPY ./app .
 RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 
-
-CMD [ "python3", "-m" , "flask", "run", "--host=0.0.0.0"]
+ENTRYPOINT [ "python3" ]
+CMD ["app.py"]
