@@ -14,5 +14,5 @@ RUN yum install -y git git-lfs python39 python39-pip \
 
 ENTRYPOINT [ "python3" ]
 
-CMD ["app.py"]
+CMD ["/app/HerokuApiDevelopment/app/app.py"]
  
