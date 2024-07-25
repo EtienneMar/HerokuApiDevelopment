@@ -39,8 +39,13 @@ except Exception as e:
 # Spécifier le chemin relatif du fichier de données prétraitées
 processed_data_path = os.path.join(current_dir, 'data', 'X_predictionV1.csv')
 # Charger les données prétraitées
+chunks_list = []
+
+# Lire le fichier CSV en morceaux
 try:
-    df_prediction = pd.read_csv(processed_data_path)
+    for chunk in pd.read_csv(processed_data_path, chunksize=5000):  # Ajustez la taille du chunk selon vos besoins
+        chunks_list.append(chunk)
+    df_prediction = pd.concat(chunks_list, ignore_index=True)
     logger.info("Données prétraitées chargées avec succès")
     logger.info(f"Colonnes disponibles dans df_prediction : {df_prediction.columns.tolist()[:10]}")
 except FileNotFoundError:
@@ -49,7 +54,6 @@ except FileNotFoundError:
 except Exception as e:
     logger.error(f"Erreur lors du chargement des données prétraitées : {e}")
     df_prediction = None
-
 # Extraction des noms de colonnes utilisées pour l'entraînement
 try:
     if model:
